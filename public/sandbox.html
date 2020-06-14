@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  </head>
+  <body>
+    <div id="app"></div>
+    <noscript>
+      <strong>
+        sandbox isn't turn on allow-script
+      </strong>
+    </noscript>
+    <script>
+      window.addEventListener("message", receiveMessage, false);
+      function receiveMessage(e) {
+        if (e.data.type !== "solution test start") return;
+        const data = e.data.data;
+        const funcContent = data.solution;
+        const testCase = data.testCase;
+
+        const solutionFunc = compileCode(funcContent);
+        const retList = [];
+        testCase.forEach((test) => {
+          const start = performance.now();
+          const ret = solutionFunc(test[0]);
+          const duration = performance.now() - start;
+          retList.push({
+            input: test[0],
+            output: ret,
+            expect: test[1],
+            // ms
+            duration: duration,
+          });
+        });
+
+        parent.postMessage(
+          {
+            type: "solution test end",
+            data: retList,
+          },
+          "http://localhost:8080"
+        );
+      }
+
+      function compileCode(src) {
+        const code = `return (${src}).apply(null, args)`;
+        return new Function("args", code);
+      }
+    </script>
+  </body>
+</html>

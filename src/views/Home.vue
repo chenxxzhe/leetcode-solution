@@ -1,18 +1,22 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+  <div class="wrapper">
+    Leetcode question answers
   </div>
 </template>
+<script lang="ts">
+import { defineComponent } from '@vue/composition-api'
 
-<script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+const Home = defineComponent({
+  name: 'Home',
+  setup() {
+    return {}
+  },
+})
 
-export default {
-  name: "Home",
-  components: {
-    HelloWorld
-  }
-};
+export default Home
 </script>
+
+<style lang="less" scoped>
+.wrapper {
+}
+</style>

@@ -1,29 +1,42 @@
 # leetcode
 
 ## Project setup
+
 ```
 yarn install
 ```
 
 ### Compiles and hot-reloads for development
+
 ```
 yarn serve
 ```
 
 ### Compiles and minifies for production
+
 ```
 yarn build
 ```
 
 ### Run your unit tests
+
 ```
 yarn test:unit
 ```
 
 ### Lints and fixes files
+
 ```
 yarn lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 算法性能优化
+
+- 少改变数组,对象 i.e Array.pop ...
+- 少变量
+- 位运算(不能为了性能牺牲可读性)
+- 少递归
+- 少用对象的方法 i.e Array.prototype Object.prototype
+- 使用高级算法
+
+找东西,用表,用索引
