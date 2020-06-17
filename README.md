@@ -30,6 +30,11 @@ yarn test:unit
 yarn lint
 ```
 
+## TODO
+
+- QueryConfig 要加上 testcase 的自定义处理
+
+
 ## 算法性能优化
 
 - 少改变数组,对象 i.e Array.pop ...
