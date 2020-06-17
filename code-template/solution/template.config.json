@@ -1,0 +1,11 @@
+{
+  "name": "Solution Template",
+  "variables": [
+    {
+      "name": "name",
+      "style": {
+        "case": "auto"
+      }
+    }
+  ]
+}
