@@ -33,7 +33,7 @@ yarn lint
 ## TODO
 
 - QueryConfig 要加上 testcase 的自定义处理
-
+- Problems.vue 放到 sandbox
 
 ## 算法性能优化
 
@@ -53,5 +53,4 @@ yarn lint
 #### Array
 
 - 数组相关, 与位置无关的结果, 可以先排序再处理, 要注意不不一定数字才能排序, 字符也可以
-- *遍历可以考虑跳过无用的值, 从而提速
-
+- \*遍历可以考虑跳过无用的值, 从而提速

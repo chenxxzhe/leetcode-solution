@@ -18,7 +18,7 @@ const desc = `
 `
 
 const config: QuestionConfig = {
-  id: 7,
+  id: 14,
   desc,
   category: 'algorithm',
   solutions: {
