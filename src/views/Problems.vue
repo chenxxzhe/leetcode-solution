@@ -1,6 +1,8 @@
 <template>
   <div class="wrapper">
+    <p>{{ question.id }}. {{ id }}</p>
     <pre class="desc">
+      
       {{ question.desc }}
     </pre>
     <div class="content-wrapper">
@@ -14,7 +16,7 @@
       <el-tag
         v-for="(s, key) in question.solutions"
         :key="key"
-        :type="key === state.activeName ? 'success' : ''"
+        :type="key === state.activeName ? '' : 'info'"
         @click="() => changeSolution(key)"
       >
         {{ key }}
@@ -24,21 +26,25 @@
       <p>
         <el-button
           type="primary"
+          :disabled="!state.solution"
           @click="run"
         >
           run
         </el-button>
       </p>
-      <div v-if="result.error || result.pass > 0">
-        <p v-if="result.pass > 0">
-          PASS <span>cost: {{ result.pass.toFixed(4) }}ms</span>
+      <div v-if="state.result.pass > 0">
+        <p>
+          PASS <span>cost: {{ state.result.pass.toFixed(4) }}ms</span>
         </p>
-        <div v-else>
-          <p>duration: {{ result.error.duration }}</p>
-          <p>input: {{ result.error.input }}</p>
-          <p>output: {{ result.error.output }}</p>
-          <p>exprect: {{ result.error.expect }}</p>
-        </div>
+      </div>
+      <div v-if="state.result.error">
+        <p style="color: red;">
+          Fail
+        </p>
+        <p>duration: {{ state.result.error.duration }}</p>
+        <p>input: {{ state.result.error.input }}</p>
+        <p>output: {{ state.result.error.output }}</p>
+        <p>exprect: {{ state.result.error.expect }}</p>
       </div>
     </div>
     <div class="comment">
@@ -53,7 +59,7 @@
   </div>
 </template>
 <script lang="ts">
-import { defineComponent, computed, reactive, onMounted, ref, onUnmounted } from '@vue/composition-api'
+import { defineComponent, computed, reactive, onMounted, ref, onUnmounted, watchEffect, watch } from '@vue/composition-api'
 import { getQuestion } from '../assets/questions'
 
 interface TestResult {
@@ -65,32 +71,9 @@ interface TestResult {
 
 interface Result {
   pass: number
-  error: TestResult
+  error?: TestResult | null
 }
 
-
-const listenMessage = (): Result  => {
-  const result = reactive<Result>({pass: -1} as any)
-  const receive = (e: MessageEvent) => {
-    if (e.data.type !== 'solution test end') return
-    const data: TestResult[] = e.data.data
-    result.error = data.find(item => JSON.stringify(item.output) !== JSON.stringify(item.expect))!
-    if (result.error) {
-      result.pass = -1
-    } else {
-      result.pass = data.reduce((ret, item) => {
-        return ret + item.duration
-      }, 0) / data.length
-    }
-  }
-  onMounted(() => {
-    window.addEventListener('message', receive,false)
-  })
-  onUnmounted(() => {
-    window.removeEventListener('message', receive,false)
-  })
-  return result
-}
 
 
 const Problems = defineComponent({
@@ -100,35 +83,60 @@ const Problems = defineComponent({
     id: { type: String, default: ''},
   },
   setup(prop) {
-    const question = computed(() =>({...getQuestion(prop.level, prop.id)}))
+    const question = computed(() =>({...getQuestion(prop.level as QuestionDifficulty, prop.id)}))
     const state = reactive({
       activeName: '',
       solution: '',
+      result: {pass: -1} as Result,
     })
     const iframe = ref<HTMLIFrameElement>(null!)
+
+    const changeSolution = (name?: string): void => {
+      state.activeName = name || 'default'
+      state.solution = question.value.solutions[state.activeName].toString().replace(/^[\s]{4}/mg, '')
+      state.result = {pass: -1}
+    }
+
+    watch(prop, () => {
+      changeSolution()
+    }, {immediate: true})
+
     onMounted(() => {
-      const solutions = Object.entries(question.value.solutions)
-      state.activeName = solutions[0][0]
-      state.solution = solutions[0][1].toString()
+      // listen message
+      const receive = (e: MessageEvent) => {
+        if (e.data.type !== 'solution test end') return
+        const data: TestResult[] = e.data.data
+        const error = data.find(item => JSON.stringify(item.output) !== JSON.stringify(item.expect))
+        // reactive 只能识别到第一层
+        state.result = error ? {
+          error,
+          pass: -1,
+        } : {
+          pass: data.reduce((ret, item) => {
+            return ret + item.duration
+          }, 0) / data.length,
+        }
+      }
+      window.addEventListener('message', receive, false)
+      onUnmounted(() => {
+        window.removeEventListener('message', receive, false)
+      })
     })
     
     return {
-      result: listenMessage(),
-      iframe,
       state,
+      iframe,
       question,
-      changeSolution(name: string) {
-        state.activeName = name
-        state.solution = question.value.solutions[name].toString()
-      },
+      changeSolution,
       run() {
         iframe.value.contentWindow!.postMessage({
           type: 'solution test start',
           data: {
-            solution: state.solution,
-            testCase: question.value.testCase,
+            level: prop.level,
+            id: prop.id,
+            solution: state.solution.toString(),
           },
-        }, 'http://localhost:8080')
+        }, '*')
       },
     }
   },

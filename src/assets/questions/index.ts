@@ -12,6 +12,6 @@ export const questions: Record<string, Record<string, QuestionConfig>> = ctx
     return map
   }, {} as any)
 
-export const getQuestion = (level: string, name: string): QuestionConfig => {
+export const getQuestion = (level: QuestionDifficulty, name: string): QuestionConfig => {
   return questions[level][name]
 }
