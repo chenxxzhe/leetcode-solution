@@ -20,6 +20,7 @@ declare interface QuestionConfig {
     default: Function
     [strategy: string]: Function
   }
+  /** [args, expect] */
   testCase: TestCase[]
   /** handle test case */
   beforeSolution?: (testCase: any[]) => any[]
