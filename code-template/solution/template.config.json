@@ -4,7 +4,7 @@
     {
       "name": "name",
       "style": {
-        "case": "auto"
+        "case": "kebabCase"
       }
     }
   ]
