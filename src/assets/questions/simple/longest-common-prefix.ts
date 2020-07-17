@@ -60,9 +60,9 @@ const config: QuestionConfig = {
     },
   },
   testCase: [
-    [['flower','flow','flight'], 'fl'],
-    [[], ''],
-    [['flower','flow','flight', 'faaaa'], 'f'],
+    [[['flower','flow','flight']], 'fl'],
+    [[[]], ''],
+    [[['flower','flow','flight', 'faaaa']], 'f'],
   ],
   comment: '使用运算方式, 搬运数字, 而不是使用字符串的方法.',
 }

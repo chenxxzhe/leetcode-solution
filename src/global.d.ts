@@ -23,7 +23,7 @@ declare interface QuestionConfig {
   /** [args, expect] */
   testCase: TestCase[]
   /** handle test case */
-  beforeSolution?: (testCase: any[]) => any[]
+  beforeSolution?: (testCase: any[]) => any[] | void
   /** handle output */
   afterSolution?: (output: any) => any
 }
